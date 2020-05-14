@@ -1,0 +1,17 @@
+#version 330 core
+
+layout (location = 0) in vec4 position;
+layout (location = 1) in mat4 model;
+
+uniform vec3 color[100];
+uniform mat4 projection;
+
+out vec3 outColor;
+out vec2 outTexCoord;
+
+void main()
+{
+   outColor = color[gl_InstanceID];
+   //outTexCoord = texCoord;
+   gl_Position = model * position;
+}
