@@ -1,6 +1,10 @@
 # Welcome
 
-The idea of this web site is to be a summary of topics that I discuss on my [https://rayosypixeles.com/](Spanish website) on graphics programming. I'm not an expert at all, so don't expect these experiments to be jaw-dropping. I'm just trying to build my knowledge from the ground-up and therefore you'll see my first experiments are all about simply rendering triangles or quads without any further processing.
+This a summary and actual implementation of topics that I discuss on my [Spanish website](https://rayosypixeles.com/) on graphics programming. I'm not an expert at all, so don't expect these experiments to be jaw-dropping. I'm just trying to build my knowledge from the ground-up and therefore you'll see my first experiments are all about simply rendering triangles/quads without any further processing.
+
+# Building the examples
+
+I'm using Visual Studio 2019 for building the experiments. I use [GLFW](https://www.glfw.org/) for OpenGL context management and input processing, and [Glad](https://glad.dav1d.de/) for accessing OpenGL extensions. The best resource I know to learn how to configure all this stuff is the [Learn OpenGL](https://learnopengl.com/) site.
 
 # Contact
 
