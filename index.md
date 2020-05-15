@@ -6,6 +6,15 @@ This a summary and actual implementation of topics that I discuss on my [Spanish
 
 I'm using Visual Studio 2019 for building the experiments. I use [GLFW](https://www.glfw.org/) for OpenGL context management and input processing, and [Glad](https://glad.dav1d.de/) for accessing OpenGL extensions. The best resource I know to learn how to configure all this stuff is the [Learn OpenGL](https://learnopengl.com/) site.
 
+# Projects
+
+## SetupOpenGL
+
+As the title suggests, this is just a project to test the correct configuration of all you need: GLFW, Glad, GLM, stb_image.h, etc. The outcome is three rotating textured quads (textures taken from [Learn OpenGL](https://learnopengl.com/)), as shown below:
+
+![Outcome of SetupOpenGL Project](https://rayosypixeles.com/wp-content/uploads/2020/05/ezgif-5-1fa61e61d530.gif)
+
+
 # Contact
 
 You can contact me via francis[at]rayosypixeles[dot]com
