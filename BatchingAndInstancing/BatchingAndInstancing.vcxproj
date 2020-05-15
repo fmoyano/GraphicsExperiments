@@ -29,7 +29,7 @@
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>16.0</VCProjectVersion>
-    <ProjectGuid>{F48A2F08-36F4-4785-9E45-F36A88AABD0C}</ProjectGuid>
+    <ProjectGuid>{88FD510B-6531-48B5-8FFE-0F4AD46BF47A}</ProjectGuid>
     <RootNamespace>PrototypeECS</RootNamespace>
     <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
