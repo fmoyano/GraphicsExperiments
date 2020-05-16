@@ -315,23 +315,6 @@ void AddIndicesToBatch(unsigned int* indicesBatch, unsigned int sprIndex) noexce
 	}
 }
 
-bool AllTasksCompleted(const std::vector<std::future<void>>& futures)
-{
-	bool tasksCompleted = true;
-
-	std::chrono::milliseconds span(0);
-	for (const auto& future : futures)
-	{
-		tasksCompleted = tasksCompleted && future.wait_for(span) == std::future_status::ready;
-		if (!tasksCompleted)
-		{
-			break;
-		}
-	}
-
-	return tasksCompleted;
-}
-
 void BatchSprites()
 {
 	//Create the aggregate vertices array
@@ -345,8 +328,7 @@ void BatchSprites()
 	unsigned int sprIndex = 0;
 	for (const auto& sprRenderer : spriteRenderers)
 	{
-		std::async(std::launch::async, AddIndicesToBatch, indicesBatch, sprIndex);
-		//AddIndicesToBatch(indicesBatch, sprIndex);
+		AddIndicesToBatch(indicesBatch, sprIndex);
 
 		auto entity = gameEntities[sprRenderer.entity];
 		auto transform = transforms[entity.transform];
@@ -359,9 +341,8 @@ void BatchSprites()
 		auto transformedVerticesPositions = glm::value_ptr(model * basePositionMatrix);
 		auto sprColor = glm::value_ptr(sprRenderer.color);
 
-		//std::async(std::launch::async, AddVerticesInfoToBatch, verticesBatch, transformedVerticesPositions, sprColor, sprIndex);
 		AddVerticesInfoToBatch(verticesBatch, transformedVerticesPositions, sprColor, sprIndex);
-
+		
 		++sprIndex;
 	}
 }
