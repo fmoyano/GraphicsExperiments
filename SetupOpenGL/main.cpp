@@ -14,6 +14,7 @@
 
 GLuint shaderProgram;
 GLuint vertexBufferObject;
+GLuint texcoordBufferObject;
 GLuint elementBufferObject;
 GLuint vertexArrayObject;
 
@@ -22,7 +23,7 @@ GLuint texture2;
 
 int width, height;
 
-const float vertices[] = {
+constexpr float vertices[] = {
 	0.2f, 0.2f, 0.0f, 1.0f,    1.0f, 0.0f, 0.0f,   1.0f, 1.0f,
 	0.2f, -0.8f, 0.0f, 1.0f,   0.0f, 1.0f, 0.0f,   1.0f, 0.0f,
 	-0.8f, -0.8f, 0.0f, 1.0f,  0.0f, 0.0f, 1.0f,   0.0f, 0.0f,
@@ -39,7 +40,41 @@ const float vertices[] = {
 	-0.4f, 0.6f, 0.6f, 1.0f,   1.0f, 1.0f, 0.0f,   0.0f, 1.0f
 };
 
-const unsigned int indices[] = {
+constexpr float vertices2[] = {
+	0.2f, 0.2f, 0.0f, 1.0f,
+	0.2f, -0.8f, 0.0f, 1.0f, 
+	-0.8f, -0.8f, 0.0f, 1.0f,
+	-0.8f, 0.2f, 0.0f, 1.0f,
+
+	0.8f, 0.8f, 0.8f, 1.0f,
+	0.8f, -0.2f, 0.8f, 1.0f,
+	-0.2f, -0.2f, 0.8f, 1.0f,
+	-0.2f, 0.8f, 0.8f, 1.0f,
+
+	0.6f, 0.6f, 0.6f, 1.0f,
+	0.6f, -0.4f, 0.6f, 1.0f,
+	-0.4f, -0.4f, 0.6f, 1.0f,
+	-0.4f, 0.6f, 0.6f, 1.0f,
+};
+
+constexpr float texcoords[] = {
+	 1.0f, 1.0f,
+	 1.0f, 0.0f,
+	 0.0f, 0.0f,
+	 0.0f, 1.0f,
+
+	 1.0f, 1.0f,
+	 1.0f, 0.0f,
+	 0.0f, 0.0f,
+	 0.0f, 1.0f,
+
+	 1.0f, 1.0f,
+	 1.0f, 0.0f,
+	 0.0f, 0.0f,
+	 0.0f, 1.0f
+};
+
+constexpr unsigned int indices[] = {
 	0, 1, 2,
 	0, 2, 3,
 
@@ -65,18 +100,14 @@ static void FramebufferSizeChanged(GLFWwindow* window, int newWidth, int newHeig
 	glViewport(0, 0, width, height);
 }
 
-static void ProcessInput(GLFWwindow* window)
-{
-
-}
-
-void Initialize()
+//This version of Initialize uses one unique VBO to store all the vertex attributes
+void Initialize1()
 {
 	glGenBuffers(1, &vertexBufferObject);
 	glGenBuffers(1, &elementBufferObject);
 	//IMPORTANT: OpenGL Core needs Vertex Array Objects to render anything
 	glGenVertexArrays(1, &vertexArrayObject);
-	
+
 	glBindVertexArray(vertexArrayObject);
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, elementBufferObject);
 	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
@@ -90,10 +121,39 @@ void Initialize()
 
 	glEnableVertexAttribArray(1);
 	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 9 * sizeof(float), (void*)(4*sizeof(float)));
-
+	
 	glEnableVertexAttribArray(2);
 	glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 9 * sizeof(float), (void*)(7 * sizeof(float)));
 
+}
+
+//This version of Initialize uses two VBOs: one stores positions, the other stores texture coordinates
+void Initialize2()
+{
+	glGenBuffers(1, &vertexBufferObject);
+	glGenBuffers(1, &elementBufferObject);
+	glGenBuffers(1, &texcoordBufferObject);
+	//IMPORTANT: OpenGL Core needs Vertex Array Objects to render anything
+	glGenVertexArrays(1, &vertexArrayObject);
+	
+	glBindVertexArray(vertexArrayObject);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, elementBufferObject);
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
+
+	glBindBuffer(GL_ARRAY_BUFFER, vertexBufferObject);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(vertices2), vertices2, GL_STATIC_DRAW);
+
+	glBindBuffer(GL_ARRAY_BUFFER, texcoordBufferObject);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(texcoords), texcoords, GL_STATIC_DRAW);
+
+	glBindBuffer(GL_ARRAY_BUFFER, vertexBufferObject);
+	glEnableVertexAttribArray(0);
+	//glVertexAttribPointer takes the latest buffer bound to GL_ARRAY_BUFFER target
+	glVertexAttribPointer(0, 4, GL_FLOAT, GL_FALSE, 4 * sizeof(float), 0);
+
+	glBindBuffer(GL_ARRAY_BUFFER, texcoordBufferObject);
+	glEnableVertexAttribArray(2);
+	glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(float), 0);
 }
 
 GLuint CreateShader(GLenum shaderType, const std::string& strShaderFile)
@@ -288,8 +348,10 @@ int main()
 	glfwGetFramebufferSize(window, &width, &height);
 	glViewport(0, 0, width, height);
 	
-
-	Initialize();
+	//Different versions of Initialize: they all work
+	Initialize1();
+	//Initialize2();
+	
 	InitializeProgram();
 	LoadTexture();
 	
@@ -297,8 +359,6 @@ int main()
 
 	while (!glfwWindowShouldClose(window))
 	{
-		ProcessInput(window);
-
 		glClear(GL_COLOR_BUFFER_BIT);
 		glUseProgram(shaderProgram);
 		glDrawElements(GL_TRIANGLES, 18, GL_UNSIGNED_INT, 0);
