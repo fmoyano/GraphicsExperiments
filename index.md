@@ -14,6 +14,8 @@ As the title suggests, this is just a project to test the correct configuration 
 
 ![Outcome of SetupOpenGL Project](https://rayosypixeles.com/wp-content/uploads/2020/05/ezgif-5-1fa61e61d530.gif)
 
+Maybe the most interesting part of this project is the initialization part (for those who are still learning OpenGL). There are three different Initialize*() functions: the first one uses a single VBO for the attributes; the second uses two VBOs, one for each attribute (position and texture coordinate); the last one uses the most modern approach, available since OpenGL 4.6, of using binding points and named buffers (no need to bind buffers to target, except for the element buffer).
+
 
 # Contact
 
