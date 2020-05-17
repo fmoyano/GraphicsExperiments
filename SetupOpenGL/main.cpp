@@ -124,7 +124,6 @@ void Initialize1()
 	
 	glEnableVertexAttribArray(2);
 	glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 9 * sizeof(float), (void*)(7 * sizeof(float)));
-
 }
 
 //This version of Initialize uses two VBOs: one stores positions, the other stores texture coordinates
@@ -154,6 +153,41 @@ void Initialize2()
 	glBindBuffer(GL_ARRAY_BUFFER, texcoordBufferObject);
 	glEnableVertexAttribArray(2);
 	glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(float), 0);
+}
+
+void Initialize3()
+{
+	//IMPORTANT: OpenGL Core needs Vertex Array Objects to render anything
+	glGenVertexArrays(1, &vertexArrayObject);
+
+	glCreateBuffers(1, &vertexBufferObject);
+	glCreateBuffers(1, &elementBufferObject);
+
+	glBindVertexArray(vertexArrayObject);
+
+	glNamedBufferData(vertexBufferObject, sizeof(vertices), vertices, GL_STATIC_DRAW);
+
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, elementBufferObject);
+	glNamedBufferData(elementBufferObject, sizeof(indices), indices, GL_STATIC_DRAW);
+
+	//Set data for binding point 0
+	//Buffer binding point aggregates source buffer object, byte offset and stride, and instance divisor
+	glBindVertexBuffer(0, vertexBufferObject, 0, 9 * sizeof(float));
+	glVertexBindingDivisor(0, 0); //all vertex attributes associated with this binding will use the same divisor
+
+	//Vertex format aggregates enabled/disabled attributes, size type and normalization of vertex attribute data...
+	//... buffer binding point associated, byte offset
+	glEnableVertexAttribArray(0);
+	glEnableVertexAttribArray(1);
+	glEnableVertexAttribArray(2);
+	glVertexAttribFormat(0, 4, GL_FLOAT, GL_FALSE, 0);
+	glVertexAttribFormat(1, 3, GL_FLOAT, GL_FALSE, 4 * sizeof(float));
+	glVertexAttribFormat(2, 2, GL_FLOAT, GL_FALSE, 7 * sizeof(float));
+	
+	//Associate vertex attribute with binding
+	glVertexAttribBinding(0, 0);
+	glVertexAttribBinding(1, 0);
+	glVertexAttribBinding(2, 0);
 }
 
 GLuint CreateShader(GLenum shaderType, const std::string& strShaderFile)
@@ -349,8 +383,9 @@ int main()
 	glViewport(0, 0, width, height);
 	
 	//Different versions of Initialize: they all work
-	Initialize1();
+	//Initialize1();
 	//Initialize2();
+	Initialize3();
 	
 	InitializeProgram();
 	LoadTexture();
