@@ -155,6 +155,8 @@ void Initialize2()
 	glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(float), 0);
 }
 
+//This version of Initialize uses binding points to decouple
+//vertex format from source data (available since OpenGL 4.6)
 void Initialize3()
 {
 	//IMPORTANT: OpenGL Core needs Vertex Array Objects to render anything
