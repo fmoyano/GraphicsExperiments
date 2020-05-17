@@ -4,4 +4,4 @@ Collection of experiments on graphics programming for the sole purpose of learni
 
 I discuss more about my learning on graphics programming on my Spanish [website](https://rayosypixeles.com/).
 
-To visit the website of this project go [here](https://fmoyano.github.io/GraphicsExperiments/)
+To visit the website of this project go [here](https://fmoyano.github.io/GraphicsExperiments/).
