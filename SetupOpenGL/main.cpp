@@ -283,8 +283,8 @@ void InitializeProgram()
 {
 	std::vector<GLuint> shaderList;
 
-	std::string vertexSource = ReadShaderSource("Shaders\\VertexShader.txt");
-	std::string fragmentSource = ReadShaderSource("Shaders\\FragmentShader.txt");
+	std::string vertexSource = ReadShaderSource("Shaders\\VertexShader.glsl");
+	std::string fragmentSource = ReadShaderSource("Shaders\\FragmentShader.glsl");
 
 	shaderList.push_back(CreateShader(GL_VERTEX_SHADER, vertexSource));
 	shaderList.push_back(CreateShader(GL_FRAGMENT_SHADER, fragmentSource));
