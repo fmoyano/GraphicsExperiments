@@ -1,11 +1,6 @@
 #version 330 core
 
-uniform sampler2D myTexture;
-uniform sampler2D myTexture2;
-
 in vec3 outColor;
-in vec2 outTexCoord;
-
 out vec4 FragColor;
 
 void main()

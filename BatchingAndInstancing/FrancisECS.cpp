@@ -12,13 +12,21 @@
 
 using namespace FrancisECS;
 
+//Define here the behaviour of the program
+//If instancing and batching are set to false,
+//each quad is drawn in a different draw call
+extern const int numInstances = 300;
+bool instancing = true;
+bool dynamicBatch = false;
+
 GLFWwindow* FrancisECS::window;
 std::vector<SpriteRendererComponent> FrancisECS::spriteRenderers;
 std::vector<GameEntity> FrancisECS::gameEntities;
 std::vector<TransformComponent> FrancisECS::transforms;
 
 GLuint vertexBufferObject;
-GLuint instancedvertexBufferObject;
+GLuint instancedVertexBufferPositionObject;
+GLuint instancedVertexBufferColorObject;
 GLuint elementBufferObject;
 GLuint vertexArrayObject;
 float *verticesBatch;
@@ -58,8 +66,6 @@ constexpr unsigned long long totalComponentsInMatrix = numVerticesInQuad * total
 constexpr unsigned int numIndicesPerSprite = 6;
 
 bool once = false;
-bool instancing = false;
-bool dynamicBatch = true;
 
 std::string ReadShaderSource(const std::string& path)
 {
@@ -208,11 +214,11 @@ void FrancisECS::Init(int width, int height, const char* title)
 	glGenBuffers(1, &elementBufferObject);
 	glGenVertexArrays(1, &vertexArrayObject);
 
-	defaultSpriteShaderProgram = InitializeShaderProgram("Shaders\\DefaultSpriteVertexShader.txt",
-		"Shaders\\DefaultSpriteFragmentShader.txt");
+	defaultSpriteShaderProgram = InitializeShaderProgram("Shaders\\DefaultSpriteVertexShader.glsl",
+		"Shaders\\DefaultSpriteFragmentShader.glsl");
 
-	instancedSpriteShaderProgram = InitializeShaderProgram("Shaders\\DefaultSpriteVertexShaderInstanced2.txt",
-		"Shaders\\DefaultSpriteFragmentShader.txt");
+	instancedSpriteShaderProgram = InitializeShaderProgram("Shaders\\DefaultSpriteVertexShaderInstanced2.glsl",
+		"Shaders\\DefaultSpriteFragmentShader.glsl");
 }
 
 EntityHandle FrancisECS::CreateGameEntity(Vector3 position, decimal rotation, Vector3 scale)
@@ -347,7 +353,6 @@ void BatchSprites()
 	}
 }
 
-constexpr int numInstances = 100;
 void GenerateInstancedVBO()
 {
 	if (!once)
@@ -365,17 +370,24 @@ void GenerateInstancedVBO()
 		glEnableVertexAttribArray(0);
 		glVertexAttribPointer(0, 4, GL_FLOAT, GL_FALSE, 4 * sizeof(float), 0);
 
-		glGenBuffers(1, &instancedvertexBufferObject);
-		glBindBuffer(GL_ARRAY_BUFFER, instancedvertexBufferObject);
+		glGenBuffers(1, &instancedVertexBufferPositionObject);
+		glBindBuffer(GL_ARRAY_BUFFER, instancedVertexBufferPositionObject);
 		for (int i = 0; i < 4; ++i)
 		{
 			glEnableVertexAttribArray(1 + i);
 			glVertexAttribPointer(1 + i, 4, GL_FLOAT, GL_FALSE, sizeof(Matrix4x4), (const void*)(sizeof(float) * i * 4));
 			glVertexAttribDivisor(1 + i, 1);
 		}
+
+		glGenBuffers(1, &instancedVertexBufferColorObject);
+		glBindBuffer(GL_ARRAY_BUFFER, instancedVertexBufferColorObject);
+		glEnableVertexAttribArray(5);
+		glVertexAttribPointer(5, 3, GL_FLOAT, GL_FALSE, sizeof(Vector3), 0);
+		glVertexAttribDivisor(5, 1);
 	}
 
 	Matrix4x4 modelArray[numInstances];
+	Vector3 colorArray[numInstances];
 
 	int index = 0;
 	for (const auto& sprRenderer : spriteRenderers)
@@ -388,12 +400,16 @@ void GenerateInstancedVBO()
 		model = glm::rotate(model, glm::radians(transform.rotation), Vector3(0.0, 0.0, 1.0));
 		model = glm::scale(model, transform.scale);
 
-		modelArray[index++] = model;
+		modelArray[index] = model;
+		colorArray[index] = sprRenderer.color;
+		++index;
 	}	
 
-	glBindBuffer(GL_ARRAY_BUFFER, instancedvertexBufferObject);
-	glBufferData(GL_ARRAY_BUFFER, 100 * sizeof(glm::mat4), modelArray, GL_DYNAMIC_DRAW);
-	
+	glBindBuffer(GL_ARRAY_BUFFER, instancedVertexBufferPositionObject);
+	glBufferData(GL_ARRAY_BUFFER, numInstances * sizeof(Matrix4x4), modelArray, GL_DYNAMIC_DRAW);
+
+	glBindBuffer(GL_ARRAY_BUFFER, instancedVertexBufferColorObject);
+	glBufferData(GL_ARRAY_BUFFER, numInstances * sizeof(Vector3), colorArray, GL_DYNAMIC_DRAW);
 }
 
 void RunSpriteRendererSystem()
@@ -403,25 +419,7 @@ void RunSpriteRendererSystem()
 	if (instancing)
 	{
 		GenerateInstancedVBO();
-
-		int i = 0;
 		glUseProgram(instancedSpriteShaderProgram);
-
-		for (const auto& sprRenderer : spriteRenderers)
-		{
-			/*auto entity = gameEntities[sprRenderer.entity];
-			auto transform = transforms[entity.transform];
-
-			Matrix4x4 model = glm::mat4(1.0f);
-			model = glm::translate(model, transform.position);
-			model = glm::rotate(model, glm::radians(transform.rotation), Vector3(0.0, 0.0, 1.0));
-			model = glm::scale(model, transform.scale);*/
-
-			//glUniformMatrix4fv(glGetUniformLocation(instancedSpriteShaderProgram, ("model[" + std::to_string(i) + "]").c_str()), 1, GL_FALSE, glm::value_ptr(model));
-			glUniform3fv(glGetUniformLocation(instancedSpriteShaderProgram, ("color[" + std::to_string(i) + "]").c_str()), 1, glm::value_ptr(sprRenderer.color));
-			++i;
-		}
-
 		glDrawElementsInstanced(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0, spriteRenderers.size());
 	}
 	else if (dynamicBatch)
@@ -472,7 +470,6 @@ void RunSpriteRendererSystem()
 			glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
 		}
 	}
-
 }
 
 void RunTransformSystem(float deltaTime)

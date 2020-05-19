@@ -2,16 +2,12 @@
 
 layout (location = 0) in vec4 position;
 layout (location = 1) in mat4 model;
-
-uniform vec3 color[100];
-uniform mat4 projection;
+layout (location = 5) in vec3 color;
 
 out vec3 outColor;
-out vec2 outTexCoord;
 
 void main()
 {
-   outColor = color[gl_InstanceID];
-   //outTexCoord = texCoord;
+   outColor = color;
    gl_Position = model * position;
 }
