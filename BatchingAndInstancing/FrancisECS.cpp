@@ -15,9 +15,9 @@ using namespace FrancisECS;
 //Define here the behaviour of the program
 //If instancing and batching are set to false,
 //each quad is drawn in a different draw call
-extern const int numInstances = 300;
-bool instancing = true;
-bool dynamicBatch = false;
+extern const int numInstances = 2000;
+constexpr bool instancing = false;
+constexpr bool dynamicBatch = true;
 
 GLFWwindow* FrancisECS::window;
 std::vector<SpriteRendererComponent> FrancisECS::spriteRenderers;
@@ -219,6 +219,7 @@ void FrancisECS::Init(int width, int height, const char* title)
 
 	instancedSpriteShaderProgram = InitializeShaderProgram("Shaders\\DefaultSpriteVertexShaderInstanced2.glsl",
 		"Shaders\\DefaultSpriteFragmentShader.glsl");
+
 }
 
 EntityHandle FrancisECS::CreateGameEntity(Vector3 position, decimal rotation, Vector3 scale)
@@ -471,6 +472,8 @@ void RunSpriteRendererSystem()
 		}
 	}
 }
+
+
 
 void RunTransformSystem(float deltaTime)
 {

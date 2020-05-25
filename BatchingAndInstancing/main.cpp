@@ -35,18 +35,24 @@ static void ProcessInput(GLFWwindow* window)
 double lastTime;
 int main()
 {
-	FrancisECS::Init(640, 480, "My prototype");
+	FrancisECS::Init(1280, 960, "Batching and instancing");
 
 	glfwSetKeyCallback(FrancisECS::window, KeyCallback);
 	glfwSetFramebufferSizeCallback(FrancisECS::window, FramebufferSizeChanged);
 
-	auto numInstancePerColumn = static_cast<int>(sqrt(numInstances));
-	for (int i = 0; i < numInstancePerColumn; ++i)
+	auto numInstancePerRow = static_cast<int>(sqrt(numInstances));
+	int row = 0;
+	int col = 0;
+	for (int i = 0; i < numInstances; ++i)
 	{
-		for (int j = 0; j < numInstancePerColumn; ++j)
+		auto entityHandle = FrancisECS::CreateGameEntity(FrancisECS::Vector3(-1.0 + (float)col * 0.05, 1.0 - (float)row * 0.05, 0.0), 0.0, FrancisECS::Vector3(0.2f, 0.2f, 1.0f));
+		FrancisECS::AddSpriteRendererComponent(entityHandle, "", FrancisECS::Vector3((float)row / numInstancePerRow, 0.0, (float)col / numInstancePerRow));
+
+		++row;
+		if (row == numInstancePerRow)
 		{
-			auto entityHandle = FrancisECS::CreateGameEntity(FrancisECS::Vector3(-1.0 + (float)i * 0.1, 1.0 - (float)j * 0.1, 0.0), 0.0, FrancisECS::Vector3(0.5f, 0.5f, 1.0f));
-			FrancisECS::AddSpriteRendererComponent(entityHandle, "", FrancisECS::Vector3((float)i/11.0, 0.0, (float)j / 11.0));
+			row = 0;
+			++col;
 		}
 	}
 		
