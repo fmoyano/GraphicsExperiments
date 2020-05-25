@@ -16,6 +16,17 @@ As the title suggests, this is just a project to test the correct configuration 
 
 Maybe the most interesting part of this project is the initialization part (for those who are still learning OpenGL). There are three different Initialize*() functions: the first one uses a single VBO for the attributes; the second uses two VBOs, one for each attribute (position and texture coordinate); the last one uses the most modern approach, available since OpenGL 4.6, of using binding points and named buffers (no need to bind buffers to target, except for the element buffer).
 
+## Batching and instancing
+
+In this experiment we draw lots of quads on screen. Batching or instancing can be used in order to perform just one draw call for all the quads. There are three important variables that the reader can modify:
+
+* numInstances: the number of quads to draw.
+* instancing: boolean to specify that we want to use instancing
+* batching: boolean to specify that we want to use batching
+
+Batching and instancing theory, as well as some parts of the implementation, are described in the [Spanish website](https://rayosypixeles.com/). A very quick summary follows: in batching, we aggregate all the quads in one mega-mesh and call glDrawElements with all the combined indices. With instancing, we use instanced arrays to pass instance attributes to the vertex shader (position and color of each quad), and we use glDrawElementsInstanced with the number of instances to draw. The difference between using instancing/batching and not using any of them can bee seen in the following gif, which shows the output of a [Renderdoc](https://renderdoc.org/) capture:
+
+![One vs multiple draw calls]https://rayosypixeles.com/wp-content/uploads/2020/05/conSinBatchinggif.gif
 
 # Contact
 
