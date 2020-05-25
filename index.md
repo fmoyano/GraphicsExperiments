@@ -26,7 +26,7 @@ In this experiment we draw lots of quads on screen. Batching or instancing can b
 
 Batching and instancing theory, as well as some parts of the implementation, are described in the [Spanish website](https://rayosypixeles.com/). A very quick summary follows: in batching, we aggregate all the quads in one mega-mesh and call glDrawElements with all the combined indices. With instancing, we use instanced arrays to pass instance attributes to the vertex shader (position and color of each quad), and we use glDrawElementsInstanced with the number of instances to draw. The difference between using instancing/batching and not using any of them can bee seen in the following gif, which shows the output of a [Renderdoc](https://renderdoc.org/) capture:
 
-![One vs multiple draw calls]https://rayosypixeles.com/wp-content/uploads/2020/05/conSinBatchinggif.gif
+![One vs multiple draw calls](https://rayosypixeles.com/wp-content/uploads/2020/05/conSinBatchinggif.gif)
 
 # Contact
 
